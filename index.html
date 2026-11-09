@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090b12">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Airwave Control">
+  <meta name="description" content="A companion-style equalizer and audio player for Airwave headphones.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Airwave Control</title>
+  <style>
+    :root{color-scheme:dark;--bg:#090b12;--panel:#131722;--panel2:#1a2030;--line:#293044;--muted:#8d96aa;--text:#f4f6fb;--accent:#9d8cff;--cyan:#62d8d0;--warn:#ffcb78}
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(ellipse at 50% -20%,#242044 0%,var(--bg) 52%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+    button,input{font:inherit} .app{max-width:520px;margin:auto;padding:calc(env(safe-area-inset-top) + 18px) 18px calc(env(safe-area-inset-bottom) + 28px)}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.brand{display:flex;align-items:center;gap:10px}.logo{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#5a4fd1);display:grid;place-items:center;font-size:21px;box-shadow:0 8px 28px #7666ee44}
+    h1{font-size:19px;margin:0;letter-spacing:.2px}.sub{font-size:11px;color:var(--muted);margin-top:3px}.pill{border:1px solid var(--line);border-radius:30px;padding:8px 11px;color:var(--muted);font-size:11px}
+    .hero{background:linear-gradient(145deg,#24223d,#151a29 65%);border:1px solid #3a355c;border-radius:26px;padding:20px;position:relative;overflow:hidden;margin-bottom:16px}
+    .hero:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:#9d8cff12;right:-65px;top:-75px}
+    .hero-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1}.eyebrow{font-size:10px;letter-spacing:1.7px;color:#b8b0ff;text-transform:uppercase}.hero h2{font-size:21px;margin:8px 0 5px}.hero p{font-size:12px;color:#aeb4c6;margin:0}
+    .headphone{height:110px;display:grid;place-items:center;font-size:75px;filter:drop-shadow(0 12px 16px #0008);margin-top:6px}
+    .connect{width:100%;border:0;border-radius:14px;padding:13px;background:var(--accent);color:#100d20;font-weight:750;margin-top:8px}
+    .section{margin-top:22px}.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.section h3{font-size:15px;margin:0}.hint{font-size:10px;color:var(--muted)}
+    .mode-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.mode{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:14px 12px;text-align:left;color:var(--text);min-height:74px}.mode .ico{font-size:19px}.mode strong{display:block;font-size:12px;margin-top:7px}.mode.active{border-color:var(--accent);background:#24213a;box-shadow:inset 0 0 0 1px #9d8cff33}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px}.presets{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px}.preset{white-space:nowrap;border:1px solid var(--line);border-radius:20px;padding:8px 12px;background:var(--panel2);color:#c5cada;font-size:11px}.preset.active{background:#332d55;border-color:var(--accent);color:#fff}
+    .bands{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:18px}.band{text-align:center}.band output{font-size:10px;color:var(--cyan);display:block;margin-bottom:8px}.band input{appearance:slider-vertical;writing-mode:vertical-lr;direction:rtl;width:24px;height:126px;accent-color:var(--accent);touch-action:pan-y}.band label{font-size:10px;color:var(--muted);display:block;margin-top:8px}
+    .db{display:flex;justify-content:space-between;color:var(--muted);font-size:9px;margin-top:6px}
+    .player-title{font-size:13px;font-weight:650}.player-sub{font-size:11px;color:var(--muted);margin-top:4px}.file{display:block;width:100%;margin:14px 0;color:var(--muted);font-size:11px}.playrow{display:flex;align-items:center;gap:12px}.play{width:46px;height:46px;border:0;border-radius:50%;background:var(--accent);color:#100d20;font-size:18px}.progress{height:5px;border-radius:8px;background:#30384a;flex:1;overflow:hidden}.progress span{display:block;width:0;height:100%;background:var(--cyan)}
+    .notice{font-size:11px;line-height:1.5;color:var(--muted);background:#171d2b;border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:12px}.notice b{color:var(--warn)}
+    .footer{text-align:center;color:#697287;font-size:10px;margin:22px 0 4px}
+    audio{display:none}
+    @media(min-width:520px){.app{padding-top:28px}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <div class="brand"><div class="logo">♫</div><div><h1>Airwave Control</h1><div class="sub">Your personal audio space</div></div></div>
+    <div class="pill">BETA · PWA</div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-top"><div><div class="eyebrow">Device companion</div><h2>Noise Airwave Max 6</h2><p id="deviceStatus">Not connected · Demo interface</p></div><div class="pill">BLE unavailable</div></div>
+    <div class="headphone" aria-hidden="true">🎧</div>
+    <button class="connect" id="connectBtn">Check Bluetooth support</button>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h3>Noise control</h3><span class="hint">Interface preview</span></div>
+    <div class="mode-grid" id="modes">
+      <button class="mode active" data-mode="Normal"><span class="ico">◉</span><strong>Normal</strong></button>
+      <button class="mode" data-mode="Transparency"><span class="ico">◌</span><strong>Transparency</strong></button>
+      <button class="mode" data-mode="ANC"><span class="ico">◍</span><strong>Noise cancellation</strong></button>
+      <button class="mode" data-mode="Adaptive ANC"><span class="ico">✧</span><strong>Adaptive ANC</strong></button>
+    </div>
+    <div class="notice">These buttons currently change the app display only. They <b>do not change the headphone's physical ANC mode</b>. Use the headphone's built-in button for real mode changes.</div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h3>Equalizer</h3><span class="hint">For in-app audio only</span></div>
+    <div class="panel">
+      <div class="presets" id="presets">
+        <button class="preset active" data-preset="Flat">Flat</button><button class="preset" data-preset="Bass Boost">Bass Boost</button><button class="preset" data-preset="Balanced">Balanced</button><button class="preset" data-preset="Vocal">Vocal</button><button class="preset" data-preset="Treble">Treble</button>
+      </div>
+      <div class="bands" id="bands">
+        <div class="band"><output>0 dB</output><input aria-label="60 Hz" type="range" min="-12" max="12" value="0" data-freq="60"><label>60 Hz</label></div>
+        <div class="band"><output>0 dB</output><input aria-label="230 Hz" type="range" min="-12" max="12" value="0" data-freq="230"><label>230 Hz</label></div>
+        <div class="band"><output>0 dB</output><input aria-label="910 Hz" type="range" min="-12" max="12" value="0" data-freq="910"><label>910 Hz</label></div>
+        <div class="band"><output>0 dB</output><input aria-label="3.6 kHz" type="range" min="-12" max="12" value="0" data-freq="3600"><label>3.6 kHz</label></div>
+        <div class="band"><output>0 dB</output><input aria-label="14 kHz" type="range" min="-12" max="12" value="0" data-freq="14000"><label>14 kHz</label></div>
+      </div>
+      <div class="db"><span>−12 dB</span><span>0 dB</span><span>+12 dB</span></div>
+      <div class="notice">Choose a music file below to hear these EQ settings. This does not equalize audio from Spotify, YouTube or other apps.</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h3>In-app player</h3><span class="hint">Local audio</span></div>
+    <div class="panel">
+      <div class="player-title" id="trackName">Choose a song to begin</div><div class="player-sub">Audio stays in your browser</div>
+      <input class="file" id="audioFile" type="file" accept="audio/*">
+      <div class="playrow"><button class="play" id="playBtn" aria-label="Play or pause">▶</button><div class="progress"><span id="progress"></span></div><span class="hint" id="time">0:00</span></div>
+      <audio id="audio" controls></audio>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h3>Gaming mode</h3><span class="hint">Shortcut preview</span></div>
+    <button class="mode" id="gaming" style="width:100%;display:flex;align-items:center;justify-content:space-between"><span><span class="ico">🎮</span><strong style="display:inline;margin-left:9px">Gaming mode</strong></span><span class="hint" id="gamingStatus">Off</span></button>
+    <div class="notice">Gaming mode is also a display-only switch for now. Use the headphone's physical long-press control to activate its actual low-latency mode.</div>
+  </section>
+  <div class="footer">Airwave Control · Independent community project · Not affiliated with Noise</div>
+</main>
+<script>
+const presets = {
+  "Flat":[0,0,0,0,0],
+  "Bass Boost":[7,5,0,1,2],
+  "Balanced":[2,1,0,1,2],
+  "Vocal":[-2,0,4,5,2],
+  "Treble":[-2,-1,0,4,7]
+};
+const sliders=[...document.querySelectorAll('.band input')];
+let audioCtx=null, source=null, filters=[], objectUrl=null;
+const audio=document.getElementById('audio');
+function setPreset(name){
+  sliders.forEach((s,i)=>{s.value=presets[name][i];updateSlider(s)});
+  document.querySelectorAll('.preset').forEach(b=>b.classList.toggle('active',b.dataset.preset===name));
+  applyEQ();
+}
+function updateSlider(s){s.parentElement.querySelector('output').textContent=(Number(s.value)>0?'+':'')+s.value+' dB'}
+function applyEQ(){if(filters.length) sliders.forEach((s,i)=>filters[i].gain.setTargetAtTime(Number(s.value),audioCtx.currentTime,.025))}
+sliders.forEach(s=>{updateSlider(s);s.addEventListener('input',()=>{document.querySelectorAll('.preset').forEach(b=>b.classList.remove('active'));updateSlider(s);applyEQ()})});
+document.querySelectorAll('.preset').forEach(b=>b.addEventListener('click',()=>setPreset(b.dataset.preset)));
+document.querySelectorAll('.mode').forEach(b=>{if(b.dataset.mode)b.addEventListener('click',()=>{document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x===b))})});
+document.getElementById('gaming').addEventListener('click',()=>{const el=document.getElementById('gamingStatus');el.textContent=el.textContent==='Off'?'On':'Off'});
+document.getElementById('connectBtn').addEventListener('click',()=>{
+  const supported=('bluetooth' in navigator);
+  document.getElementById('deviceStatus').textContent=supported?'Web Bluetooth API detected; device control still needs a compatible browser and protocol.':'iPhone Safari does not support Web Bluetooth.';
+  document.getElementById('connectBtn').textContent=supported?'Bluetooth API detected':'Bluetooth scanning unavailable in this browser';
+});
+document.getElementById('audioFile').addEventListener('change',async e=>{
+  const file=e.target.files[0];if(!file)return;
+  if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl=URL.createObjectURL(file);
+  audio.src=objectUrl;document.getElementById('trackName').textContent=file.name;
+  try{
+    if(!audioCtx){audioCtx=new (window.AudioContext||window.webkitAudioContext)();source=audioCtx.createMediaElementSource(audio);
+      filters=[60,230,910,3600,14000].map((f,i)=>{const node=audioCtx.createBiquadFilter();node.type=i===0?'lowshelf':i===4?'highshelf':'peaking';node.frequency.value=f;node.Q.value=1;return node});
+      source.connect(filters[0]);filters.forEach((f,i)=>{if(i<filters.length-1)f.connect(filters[i+1])});filters[filters.length-1].connect(audioCtx.destination);
+    }
+    if(audioCtx.state==='suspended')await audioCtx.resume();
+  }catch(err){document.getElementById('trackName').textContent='Audio EQ unavailable in this browser';}
+});
+document.getElementById('playBtn').addEventListener('click',async()=>{if(!audio.src){document.getElementById('audioFile').click();return}if(audio.paused){if(audioCtx?.state==='suspended')await audioCtx.resume();audio.play()}else audio.pause()});
+audio.addEventListener('play',()=>document.getElementById('playBtn').textContent='Ⅱ');
+audio.addEventListener('pause',()=>document.getElementById('playBtn').textContent='▶');
+audio.addEventListener('timeupdate',()=>{const pct=audio.duration?audio.currentTime/audio.duration*100:0;document.getElementById('progress').style.width=pct+'%';const t=Math.floor(audio.currentTime);document.getElementById('time').textContent=Math.floor(t/60)+':'+String(t%60).padStart(2,'0')});
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script>
+</body></html>
